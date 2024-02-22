@@ -15,7 +15,6 @@ class _InterstitalAdPageState extends State<InterstitalAdPage> {
     initInterstitialAd();
   }
 
-
   late InterstitialAd interstitialAd;
   bool isAdLoaded = false;
 
@@ -26,7 +25,27 @@ class _InterstitalAdPageState extends State<InterstitalAdPage> {
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
           interstitialAd = ad;
-          isAdLoaded = true;
+
+          setState(() {
+            isAdLoaded = true;
+          });
+          interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              print('$ad onAdDismissedFullScreenContent.');
+              ad.dispose();
+              setState(() {
+                isAdLoaded = false;
+              });
+              print("Ad is Dismissed");
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              print('$ad onAdFailedToShowFullScreenContent: $error');
+              ad.dispose();
+            },
+            onAdShowedFullScreenContent: (ad) {
+              print('$ad onAdShowedFullScreenContent');
+            },
+          );
         },
         onAdFailedToLoad: (error) {
           interstitialAd.dispose();
@@ -45,7 +64,7 @@ class _InterstitalAdPageState extends State<InterstitalAdPage> {
         body: Center(
           child: ElevatedButton(
             onPressed: () {
-              if(isAdLoaded) {
+              if (isAdLoaded) {
                 interstitialAd.show();
               }
             },
